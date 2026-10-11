@@ -51,16 +51,19 @@ GROUP BY CustomerID
 HAVING SUM(Freight) > 200
 
 --Question 13
-SELECT Suppliers.SupplierID,Suppliers.CompanyName,Categories.CategoryName,Products.ProductName,Products.UnitPrice FROM Products, Suppliers, Categories
-WHERE Products.SupplierID = Suppliers.SupplierID AND Products.CategoryID = Categories.CategoryID
+SELECT s.SupplierID, s.CompanyName, c.CategoryName, p.ProductName, p.UnitPrice FROM Products p
+INNER JOIN Suppliers s ON p.SupplierID = s.SupplierID
+INNER JOIN Categories c ON p.CategoryID = c.CategoryID
 
 --Question 14
-SELECT Orders.OrderID, Employees.FirstName, Employees.LastName FROM Orders, Employees
-WHERE Orders.EmployeeID = Employees.EmployeeID AND Orders.ShippedDate > Orders.RequiredDate
+SELECT o.OrderID, e.FirstName, e.LastName FROM Orders o
+INNER JOIN Employees e ON o.EmployeeID = e.EmployeeID 
+WHERE o.ShippedDate > o.RequiredDate
 
 --Question 15
-SELECT ProductID, SUM(Quantity) AS TotalQuantityOfProducts FROM [Order Details]
-GROUP BY ProductID
+SELECT P.ProductName, SUM(OD.Quantity) AS TotalQuantityOfProducts FROM [Order Details] OD
+JOIN Products P ON OD.ProductID = P.ProductID
+GROUP BY P.ProductName
 HAVING SUM(Quantity) < 200
 
 --Question 16
@@ -70,21 +73,22 @@ GROUP BY CustomerID
 HAVING COUNT(OrderID) > 15
 
 --Question 17
-SELECT Products.ProductName,Products.UnitPrice,Suppliers.CompanyName FROM Products, Suppliers
-WHERE Products.SupplierID = Suppliers.SupplierID
+SELECT p.ProductName, p.UnitPrice, s.CompanyName FROM Products p
+INNER JOIN Suppliers s ON p.SupplierID = s.SupplierID
 
 --Question 18
-SELECT Products.ProductName, SUM([Order Details].UnitPrice * [Order Details].Quantity) AS TotalCostsOfOrders FROM Products, [Order Details]
-WHERE Products.ProductID = [Order Details].ProductID
-GROUP BY Products.ProductName
-HAVING SUM([Order Details].UnitPrice * [Order Details].Quantity) > 200
+SELECT P.ProductName, SUM(OD.UnitPrice * OD.Quantity * (1 - OD.Discount)) AS TotalCostsOfOrders FROM Products P 
+JOIN [Order Details] OD ON P.ProductID = OD.ProductID
+GROUP BY P.ProductName
+HAVING SUM(OD.UnitPrice * OD.Quantity * (1 - OD.Discount)) > 200
 
 --Question 19
-SELECT OrderID, COUNT(OrderID) AS NumberofOrders FROM [Order Details]
+SELECT OrderID, COUNT(*) AS NumberofOrders FROM [Order Details]
 GROUP BY OrderID
 ORDER BY NumberofOrders DESC
 
 --Question 20
-SELECT Suppliers.SupplierID, Products.ProductName, Suppliers.CompanyName FROM Products, Suppliers
-WHERE Products.SupplierID = Suppliers.SupplierID AND Suppliers.CompanyName IN ('Exotic Liquids', 'Specialty Biscuits, Ltd.', 'Escargots Nouveaux')
-ORDER BY Suppliers.SupplierID
+SELECT s.SupplierID, p.ProductName, s.CompanyName FROM Products p
+INNER JOIN Suppliers s ON p.SupplierID = s.SupplierID 
+WHERE s.CompanyName IN ('Exotic Liquids', 'Specialty Biscuits, Ltd.', 'Escargots Nouveaux')
+ORDER BY s.SupplierID
